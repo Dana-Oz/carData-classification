@@ -1,10 +1,10 @@
 library(dplyr)
-#Q1 - Upload carData and import chile dataset to a dataframe:
+#Upload carData and import chile dataset to a dataframe:
 #install.packages('carData')
 library(carData)
 df <- Chile
 
-#Q2 variable analysis:
+#variable analysis:
 
 summary(df) %>% print
 sd(df$population, na.rm = T)
@@ -42,11 +42,10 @@ ggplot(data = df) +
 ggplot(data = df) + #STATUSQUO -VOTE
   geom_density(mapping = aes(x =statusquo,fill=vote))+
   facet_wrap( ~vote)
-#Q3 -Variable transformation:
-#q3.1
+#Variable transformation:
 df$vote_ind <-ifelse(df$vote == 'Y',1, 0)
 
-#q3.2-Handeling missing data
+#Handeling missing data
 #check the ditribution of the data frame with high missing data
 summary(df[which(is.na(df$vote)),]) # vote has 168 observations missing
 summary(df[which(is.na(df$income)),]) #income has 98 observations missing168
@@ -55,14 +54,14 @@ df$income[is.na(df$income)] <- mean(df$income,na.rm=T) #Replace with mean
 #delete NA's
 df<-na.omit(df)
 
-#q3.3 Factorize variable 
+#Factorize variable 
 df$region <- factor(df$region)
 df$sex <- factor(df$sex)
 df$education <- factor(df$education, levels=c('S','PS','P'))
 #set vote as a factor
 df$vote_ind<-factor(df$vote_ind, levels=c(0,1))
 
-#Q3- calc correlation (population, age, income)
+#calc correlation (population, age, income)
 #Numeric variables- calc by pearson correlation
 #install.packages("corrplot")
 library(corrplot)
@@ -74,7 +73,7 @@ corrplot(df.cor) #get correlation plot
 ggplot(data = df) +
   geom_point(mapping = aes(x = statusquo, y = vote_ind),color="blue")
 
-#Q4- categorial features relation to vote_ind (Y variable)
+#categorial features relation to vote_ind (Y variable)
 #install.packages("gmodels")
 library(gmodels)
 
@@ -104,18 +103,18 @@ ggplot(data = df) +
   ggtitle("Distribution of class 'Vote' segmented by 'Sex' ")
 #not equally ditributed amoung binary class vote_ind
 
-#Q5 - delete 2 variables:
+#delete 2 variables:
 df$vote<-NULL
 df$statusquo<-NULL
 
-#Q6 - split to train-test:
+#split to train-test:
 set.seed(100)
 ntrain <- round(nrow(df)*0.8)
 tindex <- sample(nrow(df),ntrain) 
 train <- df[tindex, ]
 test <- df[-tindex, ]
 
-#Q7 -Modeling
+#Modeling
 #DECISION TREE #can you add direction ="both"\"forward"\"backward"
 library(rpart)
 library(pROC)
@@ -125,7 +124,7 @@ tree<-rpart(vote_ind~., data=train, method='class',cp=0.005)
 library(rpart.plot)
 rpart.plot(tree)
 
-#7.2 - Summary for trained model:
+#Summary for trained model:
 summary(tree)
 #Accuracy: (and full confusion matrix)
 train_pred <- predict(tree, train,type="class") #predict class type
